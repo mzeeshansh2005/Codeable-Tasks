@@ -1,14 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { LoginForm } from "@/components/LoginForm"
 import { SignUpForm } from "@/components/SignUpForm"
 import { useAuth } from "@/lib/auth/AuthProvider"
 import { ModeToggle } from "@/components/ThemeToggle"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true)
   const { user, loading } = useAuth()
   const router = useRouter()
 
@@ -47,37 +47,25 @@ export default function AuthPage() {
             Codeable Tasks
           </h1>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            {isLogin ? "Welcome back! Please log in to your account." : "Create a new account to get started."}
+            Manage your tasks and projects efficiently
           </p>
         </div>
 
         <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-lg dark:border-gray-700 dark:bg-gray-800">
-          <div className="mb-6 flex rounded-lg bg-gray-100 p-1 dark:bg-gray-700">
-            <button
-              type="button"
-              onClick={() => setIsLogin(true)}
-              className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-all ${
-                isLogin
-                  ? "bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-gray-100"
-                  : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-              }`}
-            >
-              Log In
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsLogin(false)}
-              className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-all ${
-                !isLogin
-                  ? "bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-gray-100"
-                  : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-              }`}
-            >
-              Sign Up
-            </button>
-          </div>
-
-          {isLogin ? <LoginForm /> : <SignUpForm />}
+          <Tabs defaultValue="login" className="w-full">
+            <TabsList className="mb-6 grid w-full grid-cols-2">
+              <TabsTrigger value="login">Log In</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="login">
+              <LoginForm />
+            </TabsContent>
+            
+            <TabsContent value="signup">
+              <SignUpForm />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

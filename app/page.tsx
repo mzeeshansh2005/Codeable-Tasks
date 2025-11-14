@@ -1,21 +1,34 @@
 "use client"
 
 import { GreetUser } from "@/components/GreetUser";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { useAuth } from "@/lib/auth/AuthProvider";
+import { Recents } from "@/components/Recents";
+import { ForYouTabs } from "@/components/ForYouTabs";
+import { motion } from "framer-motion";
 
 export default function Home() {
-  const user = useAuth()
-  if (!user) {
-    return <div>Loading...</div>
-  }
   return (
-    <ProtectedRoute>
-      <div className="w-full min-h-screen bg-background font-sans">
-        <main className="w-full flex min-h-screen flex-col items-center justify-start py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 lg:px-12">
+    <div className="w-full min-w-0 bg-background font-sans bg-gradient-to-t from-primary/10 to-white dark:from-primary/10 dark:to-background">
+      <main className="w-full mx-auto flex flex-col items-start justify-start gap-y-8 py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 lg:px-12">
+        <motion.div 
+          className="w-full"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
           <GreetUser />
-        </main>
-      </div>
-    </ProtectedRoute>
+        </motion.div>
+        <motion.div 
+          className="w-full max-w-full overflow-hidden"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+        >
+          <Recents />
+        </motion.div>
+        <div className="w-full max-w-full">
+          <ForYouTabs />
+        </div>
+      </main>
+    </div>
   )
 }

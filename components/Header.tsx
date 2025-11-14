@@ -5,7 +5,7 @@ import { LogOut, UserCircle, Moon, Sun, Monitor } from "lucide-react"
 import { useAuth } from "@/lib/auth/AuthProvider"
 import { useTheme } from "next-themes"
 import { logout } from "@/lib/firebase/logout"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -23,6 +23,7 @@ export function Header() {
   const user = auth?.user
   const router = useRouter()
   const { theme, setTheme } = useTheme()
+  const { state } = useSidebar()
 
   const handleLogout = async () => {
     try {
@@ -40,13 +41,17 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-14 items-center px-4 gap-4">
+    <header className="sticky top-0 z-50 w-full border-b bg-background backdrop-blur supports-[backdrop-filter]:bg-background/95 shrink-0">
+      <div className="flex h-14 items-center px-4 gap-4 max-w-full">
         {/* Sidebar Toggle */}
-        <SidebarTrigger className="cursor-pointer"/>
+        <SidebarTrigger className="cursor-pointer shrink-0"/>
 
-        {/* Logo */}
-        <div className="flex items-center gap-2">
+        {/* Logo - Only show when sidebar is collapsed */}
+        <div 
+          className={`flex items-center gap-2 transition-all duration-300 ease-in-out ${
+            state === "collapsed" ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4 pointer-events-none"
+          }`}
+        >
           <div className="flex items-center justify-center size-8 rounded-md bg-primary text-primary-foreground font-bold text-sm">
             CT
           </div>
@@ -56,7 +61,7 @@ export function Header() {
         </div>
 
         {/* Spacer */}
-        <div className="flex-1" />
+        <div className="flex-1 min-w-0" />
 
         {/* Account Dropdown */}
         <DropdownMenu>
@@ -64,7 +69,7 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full cursor-pointer"
+              className="rounded-full cursor-pointer shrink-0"
             >
               <div className="flex items-center justify-center size-8 rounded-full bg-primary text-primary-foreground text-sm font-medium">
                 {getInitials(user?.email || undefined)}

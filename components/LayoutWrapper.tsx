@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation"
 import { Header } from "@/components/Header"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { SideBar } from "@/components/SideBar"
+import { ProtectedRoute } from "@/components/ProtectedRoute"
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -15,14 +16,14 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex h-screen w-full overflow-hidden">
         <SideBar />
-        <div className="flex flex-1 flex-col w-full">
+        <SidebarInset className="flex-1 overflow-y-auto overflow-x-hidden">
           <Header />
-          <SidebarInset className="flex-1">
+          <ProtectedRoute>
             {children}
-          </SidebarInset>
-        </div>
+          </ProtectedRoute>
+        </SidebarInset>
       </div>
     </SidebarProvider>
   )
