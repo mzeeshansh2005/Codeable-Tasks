@@ -1,6 +1,7 @@
-import { Project } from "@/types/project";
-import { Recents } from "@/types/recents";
+import type { Project } from "@/types/project";
+import type { Recents } from "@/types/recents";
 import type { TabItem } from "@/types/tabitem";
+import type { Team } from "@/types/team";
 
 export const mockRecentProjects: Recents[] = [
   {
@@ -167,5 +168,56 @@ export const mockProjects:Project[]=[
     description: "A marketing campaign for the fourth quarter of the year",
     createdAt: new Date("2025-11-14T09:15:00"),
     updatedAt: new Date("2025-11-14T09:15:00"),
+  }
+]
+
+export const mockTeams:Team[]=[
+  {
+    id: "1",
+    name: "Team 1",
+    members: [
+      {
+        id: "1",
+        name: "John Doe",
+        email: "john.doe@example.com",
+        pic: "https://images.squarespace-cdn.com/content/v1/5e10bdc20efb8f0d169f85f9/09943d85-b8c7-4d64-af31-1a27d1b76698/arrow.png",
+      },
+      {
+        id: "2",
+        name: "Jane Doe",
+        email: "jane.doe@example.com",
+        pic: "https://images.squarespace-cdn.com/content/v1/5e10bdc20efb8f0d169f85f9/09943d85-b8c7-4d64-af31-1a27d1b76698/arrow.png",
+      },
+    ],
+    description: "Team 1 description",
+    createdBy: {
+      id: "1",
+    },
+    createdAt: new Date("2025-11-14T10:30:00"),
+    updatedAt: new Date(),
+  },
+  {
+    id: "2",
+    name: "Team 2",
+    members: [
+      {
+        id: "1",
+        name: "John Doe",
+        email: "john.doe@example.com",
+        pic: "https://images.squarespace-cdn.com/content/v1/5e10bdc20efb8f0d169f85f9/09943d85-b8c7-4d64-af31-1a27d1b76698/arrow.png",
+      },
+      {
+        id: "2",
+        name: "Jane Doe",
+        email: "jane.doe@example.com",
+        pic: "https://images.squarespace-cdn.com/content/v1/5e10bdc20efb8f0d169f85f9/09943d85-b8c7-4d64-af31-1a27d1b76698/arrow.png",
+      },
+    ],
+    description: "Team 2 description",
+    createdBy: {
+      id: "1",
+    },
+    createdAt: new Date(),
+    updatedAt: new Date(),
   }
 ]

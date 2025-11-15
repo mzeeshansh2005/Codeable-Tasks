@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDyqYTjMAHGak1nq7SkCU2ZoLrJbGPTxZI",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: "task-management-app-12eef.firebaseapp.com",
   projectId: "task-management-app-12eef",
   storageBucket: "task-management-app-12eef.firebasestorage.app",

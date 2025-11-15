@@ -1,7 +1,7 @@
 import { Item, ItemContent, ItemTitle, ItemDescription, ItemHeader } from "./ui/item"
 import { Badge } from "./ui/badge"
 import type { TabItem as TabItemType } from "@/types/tabitem"
-import { FolderIcon } from "lucide-react"
+import { KanbanIcon } from "lucide-react"
 
 interface TabItemProps {
     item: TabItemType
@@ -57,7 +57,7 @@ export function TabItem({ item }: TabItemProps) {
                     </div>
                 </ItemHeader>
                 <ItemDescription className="flex items-center gap-1.5">
-                    <FolderIcon className="w-4 h-4 text-muted-foreground" />
+                    <KanbanIcon className="w-4 h-4 text-muted-foreground" />
                     <span className="truncate">{item.project}</span>
                 </ItemDescription>
             </ItemContent>

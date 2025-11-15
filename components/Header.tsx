@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { LogOut, UserCircle, Moon, Sun, Monitor } from "lucide-react"
+import { LogOut, UserCircle, Moon, Sun, Monitor, Bell } from "lucide-react"
 import { useAuth } from "@/lib/auth/AuthProvider"
 import { useTheme } from "next-themes"
 import { logout } from "@/lib/firebase/logout"
@@ -62,7 +62,24 @@ export function Header() {
 
         {/* Spacer */}
         <div className="flex-1 min-w-0" />
-
+          {/* Notifications Dropdown */}
+          <DropdownMenu aria-label="Notifications">
+            <DropdownMenuTrigger asChild aria-label="Notifications Toggle">
+              <Button variant="ghost" size="icon" className="rounded-full cursor-pointer shrink-0">
+                <Bell className="sm:size-5 size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-72">
+              <DropdownMenuLabel className="text-sm font-semibold font-sans">Notifications</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-sm">
+                <span>Notification 1</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-sm">
+                <span>Notification 2</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         {/* Account Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
