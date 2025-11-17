@@ -34,7 +34,10 @@ export function ForYouTabs() {
                 headers: {
                     "Authorization": `Bearer ${idToken}`
                 },
-                method: "GET"
+                method: "GET",
+                next:{
+                    revalidate: 60
+                }
             })
 
             const data = await response.json()
