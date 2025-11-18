@@ -12,5 +12,5 @@ export interface Team {
     updatedAt: Date;
 }
 
-export type TeamMember = Pick<User, "id" | "name" | "email" | "pic">;
+export type TeamMember = Pick<User, "id" | "name" | "email" | "avatar">;
 export type TeamProject = Pick<Project, "id" | "title" | "img">;

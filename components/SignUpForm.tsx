@@ -59,7 +59,7 @@ export function SignUpForm() {
     setSuccess(false)
 
     try {
-      const user = await signup(data.email, data.password)
+      await signup(data.email, data.password, data.username)
       setSuccess(true)
       form.reset()
       router.push("/")
@@ -76,7 +76,8 @@ export function SignUpForm() {
     setSuccess(false)
 
     try {
-      const user = await signupWithGoogle()
+      // Sign up with Google (will sync with backend automatically)
+      await signupWithGoogle()
       setSuccess(true)
       form.reset()
       router.push("/")

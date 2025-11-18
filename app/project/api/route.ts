@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mockProjects, mockIssues } from "@/lib/mockData";
+import { mockProjects } from "@/lib/mockData";
 import { Project } from "@/types/project";
 
 const getProject = async (idToken: string, id: string): Promise<Project> => {
@@ -10,7 +10,7 @@ const getProject = async (idToken: string, id: string): Promise<Project> => {
     return project;
 }
 
-export const GET = async (req: Request) => {
+export const GET = async (req: NextRequest) => {
     const searchParams = new URL(req.url).searchParams;
     const id = searchParams.get("id");
     if (!id || id === "null" || id === "undefined") {

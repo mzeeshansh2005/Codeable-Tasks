@@ -7,9 +7,10 @@ import { SignUpForm } from "@/components/SignUpForm"
 import { useAuth } from "@/lib/auth/AuthProvider"
 import { ModeToggle } from "@/components/ThemeToggle"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { AuthPageSpinner } from "@/components/AuthPageSpinner"
 
 export default function AuthPage() {
-  const { user, loading } = useAuth()
+  const { user, loading, error } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
@@ -20,14 +21,11 @@ export default function AuthPage() {
 
   if (loading) {
     return (
-      <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/10 to-gray-50 dark:from-gray-900 dark:to-gray-800">
+      <div className="relative flex min-h-screen items-center justify-center bg-linear-to-br from-primary/10 to-gray-50 dark:from-gray-900 dark:to-gray-800">
         <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
           <ModeToggle />
         </div>
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-          <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">Loading...</p>
-        </div>
+        <AuthPageSpinner />
       </div>
     )
   }
@@ -37,7 +35,7 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/10 to-gray-50 dark:from-gray-900 dark:to-gray-800 px-4 py-12">
+    <div className="relative flex min-h-screen items-center justify-center bg-linear-to-br from-primary/10 to-gray-50 dark:from-gray-900 dark:to-gray-800 px-4 py-12">
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
         <ModeToggle />
       </div>
@@ -52,6 +50,11 @@ export default function AuthPage() {
         </div>
 
         <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+          {error && (
+            <div className="mb-4 rounded-md bg-red-50 dark:bg-red-900/20 p-4 text-sm text-red-600 dark:text-red-400">
+              {error}
+            </div>
+          )}
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="mb-6 grid w-full grid-cols-2">
               <TabsTrigger value="login">Log In</TabsTrigger>

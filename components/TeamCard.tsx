@@ -10,17 +10,17 @@ const getInitials = (name: string) =>
     name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 
 interface MemberAvatarProps {
-    pic: string
+    avatar: string
     name: string
     zIndex: number
 }
 
-const MemberAvatar = ({ pic, name, zIndex }: MemberAvatarProps) => (
+const MemberAvatar = ({ avatar, name, zIndex }: MemberAvatarProps) => (
     <Avatar 
         className="size-7 sm:size-8 rounded-full ring-2 ring-background"
         style={{ zIndex }}
     >
-        <AvatarImage src={pic} alt={name} className="rounded-full object-cover" />
+        <AvatarImage src={avatar} alt={name} className="rounded-full object-cover" />
         <AvatarFallback className="text-xs bg-primary/10 text-primary rounded-full">
             {getInitials(name)}
         </AvatarFallback>
@@ -61,7 +61,7 @@ export default function TeamCard({ team, i }: TeamCardProps) {
                                     {visibleMembers.map((member, index) => (
                                         <MemberAvatar 
                                             key={member.id}
-                                            pic={member.pic}
+                                            avatar={member.avatar || ""}
                                             name={member.name}
                                             zIndex={visibleMembers.length - index}
                                         />
