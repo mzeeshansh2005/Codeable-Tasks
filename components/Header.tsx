@@ -41,12 +41,11 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background backdrop-blur supports-[backdrop-filter]:bg-background/95 shrink-0">
+    <header className="sticky top-0 z-50 w-full border-b backdrop-blur bg-background/10 shrink-0">
       <div className="flex h-14 items-center px-4 gap-4 max-w-full">
-        {/* Sidebar Toggle */}
+
         <SidebarTrigger className="cursor-pointer shrink-0"/>
 
-        {/* Logo - Only show when sidebar is collapsed */}
         <div 
           className={`flex items-center gap-2 transition-all duration-300 ease-in-out ${
             state === "collapsed" ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4 pointer-events-none"
@@ -106,7 +105,7 @@ export function Header() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push("/profile")}>
+            <DropdownMenuItem onClick={() => router.push(`/profile/${user?.uid}`)}>
               <UserCircle className="mr-2 size-4" />
               Profile
             </DropdownMenuItem>

@@ -10,22 +10,26 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { AuthPageSpinner } from "@/components/AuthPageSpinner"
 
 export default function AuthPage() {
-  const { user, loading, error } = useAuth()
+  const { user, loading, error, authOperationInProgress } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && user && !authOperationInProgress) {
       router.push("/")
     }
-  }, [user, loading, router])
+  }, [user, loading, authOperationInProgress, router])
 
-  if (loading) {
+  if (loading || authOperationInProgress) {
     return (
       <div className="relative flex min-h-screen items-center justify-center bg-linear-to-br from-primary/10 to-gray-50 dark:from-gray-900 dark:to-gray-800">
         <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
           <ModeToggle />
         </div>
-        <AuthPageSpinner />
+        <div className="flex flex-col items-center gap-4">
+          {authOperationInProgress && (
+           <AuthPageSpinner />
+          )}
+        </div>
       </div>
     )
   }

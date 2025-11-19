@@ -20,23 +20,11 @@ export async function GET(request: NextRequest) {
                 "Authorization": `Bearer ${idToken}`
             },
         });
-        
-        if (res.status === 404) {
-            // User doesn't exist
-            return NextResponse.json({ success: true, exists: false });
+        const data = await res.json();
+        if (!data.success) {
+            return NextResponse.json({ success: false, error: data.message || "Failed to check user" }, { status: 404 });
         }
-        
-        if (!res.ok) {
-            const errorText = await res.text();
-            console.error("Backend error:", errorText);
-            return NextResponse.json(
-                { success: false, error: errorText || "Failed to check user" },
-                { status: res.status }
-            );
-        }
-        
-        // User exists
-        return NextResponse.json({ success: true, exists: true });
+        return NextResponse.json({ success: true, data: data.data });
     } catch (error: any) {
         console.error("API Route error:", error);
         return NextResponse.json(
@@ -56,11 +44,10 @@ export async function POST(request: NextRequest) {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                id: user.uid,
+                uid: user.uid,
                 email: user.email,
                 name: user.name,
                 avatar: user.avatar,
-                bio: user.bio || "",
             })
         });
         
@@ -86,6 +73,84 @@ export async function POST(request: NextRequest) {
         
         const data = await res.json();
         return NextResponse.json({ success: true, data });
+    } catch (error: any) {
+        console.error("API Route error:", error);
+        return NextResponse.json(
+            { success: false, error: error.message || "Internal server error" },
+            { status: 500 }
+        );
+    }
+}
+
+export async function PUT(request: NextRequest) {
+    try {
+        const { name, bio, avatar } = await request.json();
+        const idToken = request.headers.get("Authorization")?.split(" ")[1];
+        
+        const backendUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/`;
+        const res = await fetch(backendUrl, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                name,
+                bio,
+                avatar,
+            })
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error("Backend error:", errorText);
+            return NextResponse.json(
+                { success: false, error: errorText || "Failed to update user" },
+                { status: res.status }
+            );
+        }
+
+        const data = await res.json();
+        return NextResponse.json({ success: true, data: data.data });
+    } catch (error: any) {
+        console.error("API Route error:", error);
+        return NextResponse.json(
+            { success: false, error: error.message || "Internal server error" },
+            { status: 500 }
+        );
+    }
+}
+export async function PATCH(request: NextRequest) {
+    try {
+        const idToken = request.headers.get("Authorization")?.split(" ")[1];
+        
+        if (!idToken) {
+            return NextResponse.json(
+                { success: false, error: "No authorization token provided" },
+                { status: 401 }
+            );
+        }
+
+        const backendUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/last-signin`;
+        const res = await fetch(backendUrl, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`
+            },
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error("Backend error:", errorText);
+            return NextResponse.json(
+                { success: false, error: errorText || "Failed to update last sign-in" },
+                { status: res.status }
+            );
+        }
+
+        const data = await res.json();
+        return NextResponse.json({ success: true, data: data.data });
     } catch (error: any) {
         console.error("API Route error:", error);
         return NextResponse.json(

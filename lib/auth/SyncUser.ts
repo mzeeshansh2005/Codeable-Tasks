@@ -18,7 +18,6 @@ export async function syncUserWithBackend(firebaseUser: User, retries = 3): Prom
               email: firebaseUser.email,
               name: username,
               avatar: firebaseUser.photoURL,
-              bio: "",
             }
           }),
         })

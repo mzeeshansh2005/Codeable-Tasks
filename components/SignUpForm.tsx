@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { signup, signupWithGoogle } from "@/lib/firebase/signup"
+import { useAuth } from "@/lib/auth/AuthProvider"
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -41,7 +42,7 @@ export function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const router = useRouter()
+  const { setAuthOperationInProgress } = useAuth()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,14 +58,17 @@ export function SignUpForm() {
     setIsLoading(true)
     setError(null)
     setSuccess(false)
+    
+    setAuthOperationInProgress(true)
 
     try {
       await signup(data.email, data.password, data.username)
       setSuccess(true)
       form.reset()
-      router.push("/")
+      setAuthOperationInProgress(false)
     } catch (err: any) {
       setError(err.message || "An error occurred during sign up.")
+      setAuthOperationInProgress(false)
     } finally {
       setIsLoading(false)
     }
@@ -74,15 +78,17 @@ export function SignUpForm() {
     setIsLoading(true)
     setError(null)
     setSuccess(false)
+    
+    setAuthOperationInProgress(true)
 
     try {
-      // Sign up with Google (will sync with backend automatically)
       await signupWithGoogle()
       setSuccess(true)
       form.reset()
-      router.push("/")
+      setAuthOperationInProgress(false)
     } catch (err: any) {
       setError(err.message || "An error occurred during Google sign up.")
+      setAuthOperationInProgress(false)
     } finally {
       setIsLoading(false)
     }

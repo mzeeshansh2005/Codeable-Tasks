@@ -16,8 +16,7 @@ import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { useAuth } from "@/lib/auth/AuthProvider"
 import { useEffect, useState } from "react"
-import { Recents } from "@/types/recents"
-import Image from "next/image"
+import { Recents as RecentsType } from "@/types/recents"
 import { motion } from "framer-motion"
 // Menu items.
 const items = [
@@ -42,33 +41,30 @@ export function SideBar() {
   const pathname = usePathname()
   const { state } = useSidebar()
   const { user } = useAuth()
-  const [recentProjects, setRecentProjects] = useState<Recents[]>([])
-  const fetchRecentProjects = async (): Promise<Recents[]> => {
+  const [recentProjects, setRecentProjects] = useState<RecentsType[]>([])
+  const fetchRecentProjects = async (): Promise<RecentsType[]> => {
     try {
       if (!user) {
         return [];
       }
       const idToken = await user.getIdToken();
 
-      const response = await fetch("/api/recents?type=projects", {
+      const response = await fetch("/api/recents?type=projects&limit=3", {
         headers: {
           "Authorization": `Bearer ${idToken}`
         },
         method: "GET"
       })
       const data = await response.json()
-      console.log(data)
-      if (Array.isArray(data)) {
-        return data;
-      } else {
-        console.error("Invalid data received:", data);
-        return [];
+      if (data.success && Array.isArray(data.data)) {
+        return data.data;
       }
+      return [];
     } catch (error) {
       console.error("Error fetching recents:", error);
       return [];
     }
-  }
+  };
 
   useEffect(() => {
     fetchRecentProjects().then((data) => setRecentProjects(data))
@@ -109,13 +105,12 @@ export function SideBar() {
                 {/* Recents */}
                 {recentProjects && recentProjects.length > 0 &&
                   recentProjects.map((project,i) => (
-                    <motion.div key={project.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.1 * i }}>
-                    <SidebarMenuButton asChild key={project.id} isActive={`/project/${project.id}` == pathname}>
-                      <Link href={`/project/${project.id}`} key={project.id} className="flex items-center gap-2">
-                        <Image src={project.icon} alt={project.title} width={24} height={24} />
-                        <span className="truncate text-xs sm:text-sm">{project.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
+                    <motion.div key={project.resourceId} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.1 * i }}>
+                      <SidebarMenuButton asChild key={project.resourceId} isActive={`/project/${project.resourceId}` == pathname}>
+                        <Link href={`/project/${project.resourceId}`} key={project.resourceId} className="flex items-center gap-2">
+                          <span className="truncate text-xs sm:text-sm">{project.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
                     </motion.div>
                   ))}
                 {/* More */}

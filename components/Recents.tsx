@@ -16,7 +16,7 @@ export function Recents() {
             }
             const idToken = await user.getIdToken();
             
-            const response = await fetch("/api/recents?type=all", {
+            const response = await fetch("/api/recents?type=all&limit=5", {
                 headers: {
                     "Authorization": `Bearer ${idToken}`
                 },

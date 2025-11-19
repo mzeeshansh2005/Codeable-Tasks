@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { login, loginWithGoogle } from "@/lib/firebase/login"
+import { useAuth } from "@/lib/auth/AuthProvider"
 
 const formSchema = z.object({
   email: z.string().email({
@@ -32,6 +33,7 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const router = useRouter()
+  const { setAuthOperationInProgress } = useAuth()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,14 +47,20 @@ export function LoginForm() {
     setIsLoading(true)
     setError(null)
     setSuccess(false)
+    
+    // Set flag to prevent auto-redirect during login
+    setAuthOperationInProgress(true)
 
     try {
       const user = await login(data.email, data.password)
       setSuccess(true)
       form.reset()
-      router.push("/")
+      // Clear flag before redirect - auth page will handle the redirect
+      setAuthOperationInProgress(false)
     } catch (err: any) {
       setError(err.message || "An error occurred during login.")
+      // Clear flag on error
+      setAuthOperationInProgress(false)
     } finally {
       setIsLoading(false)
     }
@@ -62,14 +70,20 @@ export function LoginForm() {
     setIsLoading(true)
     setError(null)
     setSuccess(false)
+    
+    // Set flag to prevent auto-redirect during login
+    setAuthOperationInProgress(true)
 
     try {
       const user = await loginWithGoogle()
       setSuccess(true)
       form.reset()
-      router.push("/")
+      // Clear flag before redirect - auth page will handle the redirect
+      setAuthOperationInProgress(false)
     } catch (err: any) {
       setError(err.message || "An error occurred during Google login.")
+      // Clear flag on error
+      setAuthOperationInProgress(false)
     } finally {
       setIsLoading(false)
     }

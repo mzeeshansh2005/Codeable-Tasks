@@ -1,8 +1,7 @@
 export interface Recents {
-  id: string;
+  resourceId: string;
   title: string;
   type: "project" | "issue";
-  icon: string;
   lastAccessed?: Date;
 }
 
