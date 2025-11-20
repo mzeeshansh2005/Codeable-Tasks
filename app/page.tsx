@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { GreetUser } from "@/components/GreetUser";
 import { Recents } from "@/components/Recents";
@@ -7,9 +7,9 @@ import { motion } from "framer-motion";
 
 export default function Home() {
   return (
-    <div className="w-full min-w-0 bg-background font-sans bg-gradient-to-t from-primary/10 to-white dark:from-primary/10 dark:to-background">
+    <div className="w-full h-full min-w-0">
       <main className="w-full mx-auto flex flex-col items-start justify-start gap-y-8 py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 lg:px-12">
-        <motion.div 
+        <motion.div
           className="w-full"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -17,7 +17,7 @@ export default function Home() {
         >
           <GreetUser />
         </motion.div>
-        <motion.div 
+        <motion.div
           className="w-full max-w-full overflow-hidden"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -30,5 +30,5 @@ export default function Home() {
         </div>
       </main>
     </div>
-  )
+  );
 }

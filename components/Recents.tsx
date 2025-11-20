@@ -3,6 +3,7 @@ import { RecentsCarousel } from "./RecentsCarousel"
 import { Recents as RecentsType  } from "@/types/recents"
 import { useAuth } from "@/lib/auth/AuthProvider"
 import { ClockFadingIcon } from "lucide-react"
+import { apiGet } from "@/lib/api/apiClient"
 
 export function Recents() {
     const [recents, setRecents] = useState<RecentsType[]>([])
@@ -16,12 +17,7 @@ export function Recents() {
             }
             const idToken = await user.getIdToken();
             
-            const response = await fetch("/api/recents?type=all&limit=5", {
-                headers: {
-                    "Authorization": `Bearer ${idToken}`
-                },
-                method: "GET"
-            })
+            const response = await apiGet("/api/recents?type=all&limit=5", idToken)
             const data = await response.json()
             
             if (Array.isArray(data)) {
@@ -39,7 +35,7 @@ export function Recents() {
     useEffect(() => {
         fetchRecents()
     }, [user])
-    return (
+    return recents && recents.length > 0 ? (
         <div className="w-full max-w-full overflow-hidden">
             <div className="flex items-center justify-between">
                 <h2 className="text-lg font-medium mb-4">Recents</h2>
@@ -47,5 +43,5 @@ export function Recents() {
             </div>
             <RecentsCarousel recents={recents} />
         </div>
-    )
+    ) : null;
 }

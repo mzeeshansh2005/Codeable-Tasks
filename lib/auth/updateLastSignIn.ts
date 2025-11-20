@@ -1,4 +1,5 @@
 import { User } from "firebase/auth";
+import { apiPatch } from "@/lib/api/apiClient";
 
 /**
  * Updates the user's last sign-in time in the backend
@@ -10,13 +11,7 @@ export async function updateLastSignIn(firebaseUser: User): Promise<boolean> {
   try {
     const idToken = await firebaseUser.getIdToken();
     
-    const response = await fetch("/api/user/", {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${idToken}`,
-      },
-    });
+    const response = await apiPatch("/api/user/", undefined, idToken);
 
     if (!response.ok) {
       console.error("Failed to update last sign-in:", await response.text());

@@ -1,4 +1,5 @@
 import { User } from "firebase/auth"
+import { apiPost } from "@/lib/api/apiClient"
 
 export async function syncUserWithBackend(firebaseUser: User, retries = 3): Promise<boolean> {
     for (let attempt = 1; attempt <= retries; attempt++) {
@@ -7,19 +8,13 @@ export async function syncUserWithBackend(firebaseUser: User, retries = 3): Prom
         
         const username = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User'
         
-        const response = await fetch("/api/user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ 
-            user: {
-              uid: firebaseUser.uid,
-              email: firebaseUser.email,
-              name: username,
-              avatar: firebaseUser.photoURL,
-            }
-          }),
+        const response = await apiPost("/api/user", { 
+          user: {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            name: username,
+            avatar: firebaseUser.photoURL,
+          }
         })
         
         if (!response.ok) {

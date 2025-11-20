@@ -5,7 +5,8 @@ export interface Project {
   title: string;
   img: string;
   description: string;
+  members?: string[];
   issues?: Issue[];
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: String;
+  updatedAt?: String;
 }

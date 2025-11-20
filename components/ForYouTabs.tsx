@@ -7,6 +7,8 @@ import { TabsData } from "@/types/tabs"
 import { Clock, User, Star } from "lucide-react"
 import { useAuth } from "@/lib/auth/AuthProvider"
 import { TabItem } from "@/components/TabItem"
+import { apiGet } from "@/lib/api/apiClient"
+import Loader from "@/components/Loader"
 
 
 
@@ -30,11 +32,7 @@ export function ForYouTabs() {
 
             const idToken = await user.getIdToken()
 
-            const response = await fetch("/api/tabs", {
-                headers: {
-                    "Authorization": `Bearer ${idToken}`
-                },
-                method: "GET",
+            const response = await apiGet("/api/tabs", idToken, {
                 next:{
                     revalidate: 60
                 }
@@ -67,8 +65,7 @@ export function ForYouTabs() {
     if (isLoading) {
         return (
             <div className="w-full text-center py-12">
-                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-                <p className="mt-4 text-muted-foreground">Loading...</p>
+                <Loader size="md" hue={300} />
             </div>
         )
     }

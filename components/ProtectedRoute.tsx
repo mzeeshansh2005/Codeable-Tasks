@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth/AuthProvider"
 import { AuthPageSpinner } from "./AuthPageSpinner"
+import Loader from "./Loader"
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading, authOperationInProgress } = useAuth()
@@ -19,10 +20,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-          <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-            {authOperationInProgress ? <AuthPageSpinner /> : "Loading..."}
-          </p>
+          {authOperationInProgress ? <AuthPageSpinner /> : <Loader size="md" hue={300} />}
         </div>
       </div>
     )

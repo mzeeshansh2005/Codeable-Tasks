@@ -5,15 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
-import {
-  ArrowLeft,
-  Mail,
-  EditIcon,
-  Loader2,
-  User as UserIcon,
-  Pencil,
-  Dot,
-} from "lucide-react";
+import { ArrowLeft, Mail, EditIcon, Loader2, Pencil, Dot } from "lucide-react";
 import { useEffect, use, useState, useRef } from "react";
 import { User as UserType } from "@/types/user";
 import { formatDistanceToNow } from "date-fns";
@@ -30,6 +22,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import ProfileCard from "@/components/ProfileCard";
+import { apiGet, apiPut } from "@/lib/api/apiClient";
+import { UserInProjects } from "@/components/UserInProjects";
+import { UserInTeams } from "@/components/UserInTeams";
+import Loader from "@/components/Loader";
 
 // Default avatar image path
 const DEFAULT_AVATAR = "/user.jpg";
@@ -57,11 +53,7 @@ export default function ProfilePage({
     try {
       setIsLoading(true);
       const idToken = await user?.getIdToken();
-      const response = await fetch(`/api/user?uid=${uid}`, {
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-        },
-        method: "GET",
+      const response = await apiGet(`/api/user?uid=${uid}`, idToken, {
         next: {
           revalidate: 60,
         },
@@ -131,18 +123,15 @@ export default function ProfilePage({
     try {
       setIsSaving(true);
       const idToken = await user?.getIdToken();
-      const response = await fetch(`/api/user`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const response = await apiPut(
+        `/api/user`,
+        {
           name: formData.name,
           bio: formData.bio,
           avatar: formData.avatar,
-        }),
-      });
+        },
+        idToken
+      );
 
       if (!response.ok) {
         throw new Error("Failed to update profile");
@@ -163,15 +152,12 @@ export default function ProfilePage({
   if (!user) {
     return (
       <div className="h-full w-full flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-          <p className="text-muted-foreground">Loading profile...</p>
-        </div>
-      </div>
+        <Loader size="md" hue={300} />
+      </div>  
     );
   }
 
-  const formatDate = (dateString: string | undefined, includeTime = false) => {
+  const formatDate = (dateString: string | undefined) => {
     if (!dateString) return "Not available";
     const date = new Date(dateString);
     const options: Intl.DateTimeFormatOptions = {
@@ -183,8 +169,8 @@ export default function ProfilePage({
   };
 
   return (
-    <div className="h-full w-full bg-linear-to-b from-background to-muted/20 grid grid-cols-1 md:grid-cols-2">
-      <div className="container mx-auto py-8 px-4 max-w-4xl">
+    <div className="h-full w-full bg-linear-to-b from-background to-muted/20 grid grid-cols-1 md:grid-cols-3">
+      <div className="container mx-auto py-8 px-4 max-w-4xl md:max-w-6xl col-span-1 md:col-span-2">
         <Button
           variant="ghost"
           onClick={() => router.back()}
@@ -196,8 +182,8 @@ export default function ProfilePage({
 
         {/* Profile Header Card */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
           {userData && (
@@ -234,46 +220,52 @@ export default function ProfilePage({
                     </h1>
                     <div className="flex items-center justify-center md:justify-start gap-2 text-muted-foreground mb-3">
                       <Mail className="h-4 w-4" />
-                      <p className="text-base">{userData.email || "No email"}</p>
+                      <p className="text-base">
+                        {userData.email || "No email"}
+                      </p>
                     </div>
                     <div className="flex items-center justify-center sm:justify-start text-green-400 dark:text-green-600">
                       <Dot className="h-8 w-8" />
                       <p className="text-xs font-semibold">
                         {formatDistanceToNow(
                           new Date(userData?.updatedAt as string)
-                        )} ago
+                        )}{" "}
+                        ago
                       </p>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center justify-center sm:justify-end">
                   <p className="text-sm font-medium text-muted-foreground">
-                    Joined {formatDate(userData?.createdAt, true)}
+                    Joined {formatDate(userData?.createdAt)}
                   </p>
                 </div>
+                {uid && (
+                  <div>
+                    <UserInProjects uid={uid} />
+                    <UserInTeams uid={uid} />
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
         </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <p className="text-sm text-muted-foreground">
-            {userData?.bio || "No bio"}
-          </p>
-        </motion.div>
       </div>
       <div className="container mx-auto w-full flex items-center justify-center">
-        <ProfileCard
-          name={userData?.name || ""}
-          title={userData?.bio || ""}
-          avatarUrl={DEFAULT_AVATAR}
-          showUserInfo={false}
-          enableTilt={true}
-          enableMobileTilt={false}
-        />
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <ProfileCard
+            name={userData?.name || ""}
+            title={userData?.bio || ""}
+            avatarUrl={DEFAULT_AVATAR}
+            showUserInfo={false}
+            enableTilt={true}
+            enableMobileTilt={false}
+          />
+        </motion.div>
       </div>
 
       {/* Edit Profile Side Sheet */}

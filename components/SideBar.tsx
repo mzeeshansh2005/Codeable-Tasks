@@ -18,6 +18,7 @@ import { useAuth } from "@/lib/auth/AuthProvider"
 import { useEffect, useState } from "react"
 import { Recents as RecentsType } from "@/types/recents"
 import { motion } from "framer-motion"
+import { apiGet } from "@/lib/api/apiClient"
 // Menu items.
 const items = [
   {
@@ -49,12 +50,7 @@ export function SideBar() {
       }
       const idToken = await user.getIdToken();
 
-      const response = await fetch("/api/recents?type=projects&limit=3", {
-        headers: {
-          "Authorization": `Bearer ${idToken}`
-        },
-        method: "GET"
-      })
+      const response = await apiGet("/api/recents?type=projects&limit=3", idToken)
       const data = await response.json()
       if (data.success && Array.isArray(data.data)) {
         return data.data;

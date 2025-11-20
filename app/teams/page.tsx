@@ -6,6 +6,7 @@ import { Team as TeamType } from "@/types/team";
 import { EmptyComponent } from "@/components/Empty";
 import { Teams } from "@/components/Teams";
 import { TeamsSkeleton } from "@/components/TeamCardSkeleton";
+import { apiGet } from "@/lib/api/apiClient";
 
 type AllTeams = {
     workingIn: TeamType[],
@@ -22,13 +23,25 @@ export default function TeamsPage() {
         setLoading(true)
         try {
             const idToken = await user.getIdToken()
-            const response = await fetch("/teams/api", {
-                headers: {
-                    "Authorization": `Bearer ${idToken}`
-                }
-            })
+            const response = await apiGet(`/teams/api?uid=${user.uid}`, idToken)
             const data = await response.json()
-            setTeams({workingIn: data.workingIn, myTeams: data.myTeams})
+            
+            if (data.success) {
+                const teamsData: TeamType[] = data.data || []
+                // Separate teams where user is admin vs just a member
+                const myTeams = teamsData.filter((team) => 
+                    team.admin?.includes(user.uid)
+                )
+                const workingIn = teamsData.filter((team) => 
+                    !team.admin?.includes(user.uid)
+                )
+                setTeams({workingIn, myTeams})
+            } else {
+                setTeams({workingIn: [], myTeams: []})
+            }
+        } catch (error) {
+            console.error("Failed to fetch teams:", error)
+            setTeams({workingIn: [], myTeams: []})
         } finally {
             setLoading(false)
         }

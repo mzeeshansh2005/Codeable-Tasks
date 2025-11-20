@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { ProjectPageSkeleton } from "@/components/ProjectPageSkeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { apiGet } from "@/lib/api/apiClient";
 
 export default function ProjectPage({
   params,
@@ -53,12 +54,7 @@ export default function ProjectPage({
       }
 
       const idToken = await user.getIdToken();
-      const response = await fetch(`/project/api?id=${id}`, {
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-        },
-        method: "GET",
-      });
+      const response = await apiGet(`/project/api?id=${id}`, idToken);
 
       if (!response.ok) {
         const errorData = await response.json();

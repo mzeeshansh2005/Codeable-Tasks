@@ -4,12 +4,13 @@ import { Project } from "./project";
 export interface Team {
   id: string;
   name: string;
-  members: (TeamMember )[];
-  projects?: (TeamProject )[];
-  description: string;
-  createdBy: Pick<User, "id" > & Partial<User>;
-    createdAt: Date;
-    updatedAt: Date;
+  img?: string;
+  description?: string;
+  admin: string[];
+  members: string[];
+  projects?: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type TeamMember = Pick<User, "id" | "name" | "email" | "avatar">;

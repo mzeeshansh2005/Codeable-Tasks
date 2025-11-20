@@ -1,27 +1,52 @@
 import { NextResponse } from "next/server"
-import { mockProjects } from "@/lib/mockData"
-import { Project as ProjectType } from "@/types/project"
 
-const getProjects = async (idToken: string): Promise<ProjectType[]> => {
-    return mockProjects
+const getUserProjects = async (idToken: string, uid: string) => {
+    const backendUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${uid}`;
+    const response = await fetch(backendUrl, {
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${idToken}`
+        },
+        method: "GET"
+    });
+    
+    return response;
 }
 
 export const GET = async (req: Request) => {
     const idToken = req.headers.get("Authorization")?.split(" ")[1]
+    const { searchParams } = new URL(req.url);
+    const uid = searchParams.get("uid");
     
+    if (!uid) {
+        return NextResponse.json({success: false, error: "User ID is required"}, { status: 400 })
+    }
     if (!idToken) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+        return NextResponse.json({success: false, error: "Unauthorized"}, { status: 401 })
     }
     
     try {
-        const projects = await getProjects(idToken)
-        return NextResponse.json({projects})
+        const response = await getUserProjects(idToken, uid);
+        
+        if (response.status === 401) {
+            return NextResponse.json(
+                {success: false, error: "Unauthorized"}, 
+                { status: 401 }
+            );
+        }
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: "Unknown error" }));
+            return NextResponse.json(
+                {success: false, error: errorData.message || "Failed to fetch projects"}, 
+                { status: response.status }
+            );
+        }
+        
+        const data = await response.json();
+        return NextResponse.json({success: data.success, data: data.data});
     } catch (error) {
         console.error("Error fetching projects:", error)
-        return NextResponse.json(
-            { error: "Failed to fetch projects" },
-            { status: 500 }
-        )
+        return NextResponse.json({success: false, error: "Failed to fetch projects"}, { status: 500 })
     }
 }
-
