@@ -54,7 +54,7 @@ export default function TeamsPage() {
     const hasTeams = teams.workingIn?.length > 0 || teams.myTeams?.length > 0
     
     return (
-        <div className="w-full h-full min-w-0 bg-background font-sans bg-gradient-to-t from-primary/10 to-white dark:from-primary/10 dark:to-background">
+        <div className="w-full h-full min-w-0 bg-background font-sans bg-linear-to-t from-primary/10 to-white dark:from-primary/10 dark:to-background">
             <main className="w-full mx-auto flex flex-col items-start justify-start gap-y-8 py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 lg:px-12">
                 {loading ? (
                     <div className="w-full flex flex-col gap-y-8">

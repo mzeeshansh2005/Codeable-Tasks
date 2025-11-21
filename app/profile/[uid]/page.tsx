@@ -5,8 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
-import { ArrowLeft, Mail, EditIcon, Loader2, Pencil, Dot } from "lucide-react";
-import { useEffect, use, useState, useRef } from "react";
+import { ArrowLeft, Mail, EditIcon, Loader2, Dot } from "lucide-react";
+import { useEffect, use, useState } from "react";
 import { User as UserType } from "@/types/user";
 import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
@@ -26,6 +26,8 @@ import { apiGet, apiPut } from "@/lib/api/apiClient";
 import { UserInProjects } from "@/components/UserInProjects";
 import { UserInTeams } from "@/components/UserInTeams";
 import Loader from "@/components/Loader";
+import { useImageSelection } from "@/hooks/useImageSelection";
+import { ImageSelector } from "@/components/ImageSelector";
 
 // Default avatar image path
 const DEFAULT_AVATAR = "/user.jpg";
@@ -47,7 +49,10 @@ export default function ProfilePage({
     bio: "",
     avatar: "",
   });
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const imageSelection = useImageSelection({
+    maxSizeMB: 10,
+  });
 
   const fetchUser = async () => {
     try {
@@ -83,6 +88,9 @@ export default function ProfilePage({
         bio: userData.bio || "",
         avatar: userData.avatar || "",
       });
+      if (userData.avatar) {
+        imageSelection.setImagePreview(userData.avatar);
+      }
     }
   }, [userData]);
 
@@ -90,45 +98,20 @@ export default function ProfilePage({
     setIsSheetOpen(true);
   };
 
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Check if file is an image
-      if (!file.type.startsWith("image/")) {
-        alert("Please select an image file");
-        return;
-      }
-
-      // Check file size (limit to 5MB)
-      if (file.size > 10 * 1024 * 1024) {
-        alert("Image size should be less than 10MB");
-        return;
-      }
-
-      // Convert to base64
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setFormData({ ...formData, avatar: base64String });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleUpdateProfile = async () => {
     try {
       setIsSaving(true);
       const idToken = await user?.getIdToken();
+      
+      // Use the image preview from the hook (either file or existing avatar)
+      const avatarToSave = imageSelection.imagePreview || formData.avatar;
+      
       const response = await apiPut(
         `/api/user`,
         {
           name: formData.name,
           bio: formData.bio,
-          avatar: formData.avatar,
+          avatar: avatarToSave,
         },
         idToken
       );
@@ -281,40 +264,15 @@ export default function ProfilePage({
 
           <div className="flex flex-col gap-6 py-6">
             {/* Avatar Preview */}
-            <div className="flex flex-col items-center gap-4">
-              <div className="relative group">
-                <div
-                  onClick={handleAvatarClick}
-                  className="h-32 w-32 rounded-full bg-linear-to-br from-primary/80 to-primary flex items-center justify-center text-4xl font-bold text-primary-foreground shadow-xl ring-4 ring-background cursor-pointer transition-all hover:ring-primary/50 overflow-hidden"
-                >
-                  <Image
-                    src={formData.avatar || DEFAULT_AVATAR}
-                    alt="Profile"
-                    width={128}
-                    height={128}
-                    className="h-full w-full rounded-full object-cover"
-                  />
-                </div>
-                {/* Pencil Icon Overlay */}
-                <div
-                  onClick={handleAvatarClick}
-                  className="absolute bottom-1 right-1 h-10 w-10 rounded-full bg-primary flex items-center justify-center cursor-pointer shadow-lg hover:bg-primary/90 transition-colors"
-                >
-                  <Pencil className="h-5 w-5 text-primary-foreground" />
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground text-center">
-                Click to upload a new avatar
-              </p>
-              {/* Hidden File Input */}
-              <Input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-            </div>
+            <ImageSelector
+              imageSelection={imageSelection}
+              shape="circle"
+              size="lg"
+              layout="vertical"
+              description="Click to upload a new avatar"
+              showUrlInput={false}
+              disabled={isSaving}
+            />
 
             {/* Name Field */}
             <div className="space-y-2">

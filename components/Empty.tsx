@@ -35,7 +35,7 @@ export function EmptyComponent({ type }: { type: "project" | "team" }) {
       <EmptyContent>
         <div className="flex gap-2">
           <Button asChild>
-            <Link href={`/projects/create`}>
+            <Link href={type === "project" ? `/projects/create` : `/teams/create`}>
               Create {type === "project" ? "Project" : "Team"}
             </Link>
           </Button>

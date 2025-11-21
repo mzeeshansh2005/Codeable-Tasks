@@ -1,8 +1,8 @@
-import { Issue } from "./tabitem"
+import { TabItem } from "./tabitem"
 
 export interface TabsData {
-    workedOn: Issue[]
-    assigned: Issue[]
-    starred: Issue[]
+    workedOn: TabItem[]
+    assigned: TabItem[]
+    starred: TabItem[]
 }
 

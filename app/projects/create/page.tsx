@@ -25,7 +25,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { useImageSelection } from "@/hooks/useImageSelection";
+import { ImageSelector } from "@/components/ImageSelector";
+import Loader from "@/components/Loader";
 import z from "zod";
+import { apiPost } from "@/lib/api/apiClient";
 
 const projectSchema = z.object({
   id: z.string().optional(),
@@ -50,6 +54,11 @@ export default function CreateProjectPage() {
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
+  const imageSelection = useImageSelection({
+    maxSizeMB: 5,
+    onError: (error) => setError(error),
+  });
+
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
@@ -66,19 +75,40 @@ export default function CreateProjectPage() {
     setSuccess(false);
 
     try {
-      // TODO: Implement API call to create project
-      console.log("Creating project with data:", data);
+      const idToken = await user?.getIdToken();
+      if (!idToken) {
+        throw new Error("Unauthorized");
+        setLoading(false);
+        return;
+      }
+      const response = await apiPost(
+        "/projects/create/api",
+        {
+          title: form.getValues("title"),
+          description: form.getValues("description"),
+          img: imageSelection.imagePreview || "",
+          members: form.getValues("members"),
+        },
+        idToken
+      );
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        throw new Error("Failed to create project");
+      }
+      const data = await response.json();
+      if (!data.success) {
+        setError(data.error);
+        return;
+      }
 
       setSuccess(true);
       form.reset();
+      imageSelection.removeImage();
 
       // Redirect to projects page after success
       setTimeout(() => {
-        router.push("/projects");
-      }, 1500);
+        router.push(`/project/${data.data.id}`);
+      }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create project");
     } finally {
@@ -87,7 +117,13 @@ export default function CreateProjectPage() {
   };
 
   return (
-    <div className="w-full h-full min-w-0 bg-background font-sans bg-linear-to-t from-primary/10 to-white dark:from-primary/10 dark:to-background">
+    <div className="w-full h-full min-w-0 bg-background font-sans bg-linear-to-t from-primary/10 to-white dark:from-primary/10 dark:to-background relative">
+      {loading && (
+        <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <Loader size="lg" hue={300} />
+        </div>
+      )}
+
       <main className="w-full mx-auto flex flex-col items-start justify-start gap-y-8 py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 lg:px-12">
         <motion.div
           className="w-full"
@@ -120,6 +156,25 @@ export default function CreateProjectPage() {
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-6"
                   >
+                    {/* Project Image Section */}
+                    <FormField
+                      control={form.control}
+                      name="img"
+                      render={({ field }) => (
+                        <ImageSelector
+                          imageSelection={imageSelection}
+                          urlField={field}
+                          shape="square"
+                          size="md"
+                          layout="horizontal"
+                          label="Project Icon"
+                          description="Upload a square image (max 5MB)"
+                          showUrlInput={true}
+                          disabled={loading}
+                        />
+                      )}
+                    />
+
                     {/* Title Field */}
                     <FormField
                       control={form.control}
@@ -178,28 +233,6 @@ export default function CreateProjectPage() {
                           </FormControl>
                           <FormDescription>
                             Enter email addresses separated by commas
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Image URL Field */}
-                    <FormField
-                      control={form.control}
-                      name="img"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Project Image URL</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="url"
-                              placeholder="https://example.com/image.jpg"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            Optional: Add a cover image for your project
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
