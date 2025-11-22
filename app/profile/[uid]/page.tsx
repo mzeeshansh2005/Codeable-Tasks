@@ -28,6 +28,7 @@ import { UserInTeams } from "@/components/UserInTeams";
 import Loader from "@/components/Loader";
 import { useImageSelection } from "@/hooks/useImageSelection";
 import { ImageSelector } from "@/components/ImageSelector";
+import { toast } from "sonner";
 
 // Default avatar image path
 const DEFAULT_AVATAR = "/user.jpg";
@@ -124,9 +125,11 @@ export default function ProfilePage({
       if (data.success) {
         setUserData(data.data);
         setIsSheetOpen(false);
+        toast.success("Profile updated successfully!");
       }
     } catch (error) {
       console.error("Error updating profile:", error);
+      toast.error("Failed to update profile. Please try again.");
     } finally {
       setIsSaving(false);
     }
